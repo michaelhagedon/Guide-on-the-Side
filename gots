@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+COMPOSE="docker-compose -f docker-compose.yml -f docker-compose.local.yml"
+TTY="-T"
+
+if [ $# -gt 0 ]; then
+    if [ "$1" == "cake" ]; then
+        shift 1
+        $COMPOSE run --rm $TTY \
+            -w /var/www/html/app/ \
+            app \
+            ../lib/Cake/Console/cake "$@"
+    elif [ "$1" == "mysql" ]; then
+        shift 1
+        docker run --network gots_gotsnet -it --link db:mysql --rm mysql sh -c 'exec mysql -ugots -h db -pgots'
+    else
+        $COMPOSE "$@"
+    fi
+else
+    $COMPOSE ps
+fi

@@ -1,4 +1,5 @@
 cake
+docker-compose.local.yml
 lib
 config.yml
 app/tmp/lucene
