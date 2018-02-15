@@ -46,7 +46,12 @@ if ($revision_id) { ?>
 
 <?php echo $this->element('on_the_side', compact('id', 'tutorial_url')) ?>
 
-<iframe id="site-frame" frameBorder="0" name="site-frame" src="<?php echo $site_url ?>"></iframe>
+<iframe id="site-frame" frameBorder="0" name="site-frame" src="<?php echo $this->Html->url(
+  array(
+    'action' => 'proxy',
+    $id
+  )
+); ?>"></iframe>
 
 <div id="closed">
     <?php echo __('Display Help') ?>

@@ -1,0 +1,8 @@
+{
+    "require": {
+        "athlon1600/php-proxy": "^5.1"
+    },
+    "autoload": {
+        "psr-4": {"UALibraries\\GuideOnTheSide\\Proxy\\Plugin\\": "app/Lib/"}
+    }
+}

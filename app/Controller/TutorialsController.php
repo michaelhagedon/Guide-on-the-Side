@@ -1,4 +1,12 @@
 <?php
+
+require_once ROOT.DS.'vendor'.DS.'autoload.php';
+
+use Proxy\Http\Request;
+use Proxy\Proxy;
+use Proxy\Plugin\ProxifyPlugin;
+use UALibraries\GuideOnTheSide\Proxy\Plugin\CustomProxifyPlugin;
+
 App::uses('Sanitize', 'Utility');
 
 App::uses('AppController', 'Controller');
@@ -23,9 +31,41 @@ class TutorialsController extends AppController {
 //    array('field' => 'Keyword', 'type' => 'value', 'model' => 'Tutorial'),
 //  );
 
+  public function proxy($id = null) {
+    $this->layout = 'proxy';
+
+    if (!$id) {
+      $this->Session->setFlash(__('Invalid tutorial'));
+      $this->redirect(array('action' => 'index'));
+      return;
+    }
+    $tutorial = $this->getTutorial($id);
+
+    if (!$tutorial) {
+      $this->redirect('/');
+    }
+
+    if ($tutorial['Tutorial']['tutorial_type_id'] != TUTORIAL_TYPE_SIDEBYSIDE) {
+        $this->redirect('/');
+    }
+
+    $request = Request::createFromGlobals();
+    $proxy = new Proxy();
+    $proxy->getEventDispatcher()->addSubscriber(new ProxifyPlugin());
+    $proxy->getEventDispatcher()->addSubscriber(new CustomProxifyPlugin($tutorial));
+
+    $url = $tutorial['Tutorial']['url'];
+    if (isset($_GET['q'])) {
+      $url = rawurldecode($_GET['q']);
+    }
+
+    $response = $proxy->forward($request, $url);
+    $response->send();
+  }
+
 	function beforeFilter() {
 		parent::beforeFilter();
-		$this->Auth->allow('view', 'view_tutorial_only', 'public_index', 'view_step_by_step_only',
+		$this->Auth->allow('proxy', 'view', 'view_tutorial_only', 'public_index', 'view_step_by_step_only',
 			'view_certificate', 'provide_feedback', 'view_single_page', 'view_information', 'search');
 		$this->helpers[] = 'QuickhelpTinyMce';
 		$this->helpers[] = 'Text';
@@ -442,6 +482,11 @@ class TutorialsController extends AppController {
 				$this->redirect('/');
 			}
 		}
+
+		$this->redirect(
+		    "http://<proxy-server>/login?url=".
+        Router::url(array($id), true)
+    );
 
 		// always use the user_url (slug) when viewing
 		if (!empty($tutorial['Tutorial']['user_url']) && !isset($this->params['slug'])) {
