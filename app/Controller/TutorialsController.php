@@ -483,10 +483,7 @@ class TutorialsController extends AppController {
 			}
 		}
 
-		$this->redirect(
-		    "http://<proxy-server>/login?url=".
-        Router::url(array($id), true)
-    );
+		$this->redirect(Configure::read('user_config.proxy.prefix').Router::url(array($id), true));
 
 		// always use the user_url (slug) when viewing
 		if (!empty($tutorial['Tutorial']['user_url']) && !isset($this->params['slug'])) {
