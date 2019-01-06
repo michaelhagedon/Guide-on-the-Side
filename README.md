@@ -13,7 +13,7 @@ http://www.library.arizona.edu/applications/quickHelp/tutorial/searching-the-ua-
 Please join the discussion of Guide on the Side on our
 [Google Group](https://groups.google.com/forum/?fromgroups#!forum/gots-discuss)!
 
-More information can be found on the [Guide on the Side website](http://code.library.arizona.edu/gots).
+More information can be found on the [Guide on the Side website](https://ualibraries.github.io/Guide-on-the-Side/about.html).
 
 Platform support / dependencies
 -------------------------------------------------------------------------------
@@ -196,7 +196,7 @@ pulling from GitHub if you install that way.
     ```
 3. CakePHP is not included in our GitHub repository, so download it and place
    the lib folder into your Guide on the Side root. CakePHP 2.6.x is known to
-   work. Example command:
+   work. For PHP 7.2, you need to download CakePHP 2.9 and above. Example command:
     ```
      mv <unzipped_cakephp_folder>/lib guide_on_the_side/
     ```

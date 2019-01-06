@@ -8,3 +8,7 @@ app/webroot/uploads
 /nbproject/private/
 .idea
 /vendor
+
+# Docs
+.sass-cache
+.jekyll-metadata
