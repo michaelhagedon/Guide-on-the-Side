@@ -1,0 +1,36 @@
+version: '2'
+services:
+    db:
+        image: mysql:5.7
+        volumes:
+            - mysqldata:/var/lib/mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: gots
+            MYSQL_DATABASE: gots
+            MYSQL_USER: gots
+            MYSQL_PASSWORD: gots
+        networks:
+            - gotsnet
+    app:
+        build:
+          context: ./docker/app
+          dockerfile: Dockerfile
+        image: ualibraries/gots/app
+        depends_on:
+            - db
+        volumes:
+            - .:/var/www/html
+        environment:
+            GOTS_DB_HOST: db
+            GOTS_DB_DATABASE: gots
+            GOTS_DB_USER: gots
+            GOTS_DB_PASSWORD: gots
+
+        networks:
+            - gotsnet
+networks:
+    gotsnet:
+        driver: "bridge"
+volumes:
+    mysqldata:
+        driver: "local"
