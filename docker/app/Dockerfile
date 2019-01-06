@@ -1,11 +1,12 @@
-FROM php:7.0-apache
-RUN requirements="libmcrypt-dev g++ libicu-dev libmcrypt4 libicu52 libpng-dev" \
+FROM php:7.2-apache
+RUN requirements="libmcrypt-dev g++ libicu-dev libpng-dev" \
     && apt-get update && apt-get install -y $requirements \
     && docker-php-ext-install pdo_mysql \
-    && docker-php-ext-install mcrypt \
     && docker-php-ext-install mbstring \
     && docker-php-ext-install intl \
     && docker-php-ext-install gd \
+    && pecl install mcrypt-1.0.1 \
+    && docker-php-ext-enable mcrypt \
     && requirementsToRemove="libmcrypt-dev g++ libicu-dev" \
     && apt-get purge --auto-remove -y $requirementsToRemove \
     && rm -rf /var/lib/apt/lists/*
