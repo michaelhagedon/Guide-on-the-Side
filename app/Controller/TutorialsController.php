@@ -2,8 +2,10 @@
 
 require_once ROOT.DS.'vendor'.DS.'autoload.php';
 
+use Proxy\Config;
 use Proxy\Http\Request;
 use Proxy\Proxy;
+use Proxy\Plugin\HeaderRewritePlugin;
 use Proxy\Plugin\ProxifyPlugin;
 use UALibraries\GuideOnTheSide\Proxy\Plugin\CustomProxifyPlugin;
 
@@ -48,24 +50,38 @@ class TutorialsController extends AppController {
     if ($tutorial['Tutorial']['tutorial_type_id'] != TUTORIAL_TYPE_SIDEBYSIDE) {
         $this->redirect('/');
     }
-
+    
+    Config::load(APPLIBS.'/ProxyConfig.php');
+    
+    // proxify_url() is using PHP_SELF for some reason.
+    // strip the query string (really just q?) for assets embedded in CSS to avoid double q parameters. See Proxy\Config\app_url().
+    // TODO: Find a better way to do this.
+    $_SERVER['PHP_SELF'] = strtok($_SERVER['REQUEST_URI'], '?');
     $request = Request::createFromGlobals();
     $proxy = new Proxy();
+    $proxy->getEventDispatcher()->addSubscriber(new HeaderRewritePlugin());
     $proxy->getEventDispatcher()->addSubscriber(new ProxifyPlugin());
-    $proxy->getEventDispatcher()->addSubscriber(new CustomProxifyPlugin($tutorial));
-
+    //$proxy->getEventDispatcher()->addSubscriber(new CustomProxifyPlugin($tutorial));
+    
     $url = $tutorial['Tutorial']['url'];
+    
+    // TODO: sanitize
     if (isset($_GET['q'])) {
       $url = rawurldecode($_GET['q']);
+      $_GET['q'] = null;
+      $request->get->set('q', null);
     }
-
+    // Spaces in the proxified asset URLs don't work.
+    $url = str_replace(' ', '%20', $url);
+    
     $response = $proxy->forward($request, $url);
+
     $response->send();
   }
 
 	function beforeFilter() {
 		parent::beforeFilter();
-		$this->Auth->allow('proxy', 'view', 'view_tutorial_only', 'public_index', 'view_step_by_step_only',
+		$this->Auth->allow('view', 'view_tutorial_only', 'public_index', 'view_step_by_step_only',
 			'view_certificate', 'provide_feedback', 'view_single_page', 'view_information', 'search');
 		$this->helpers[] = 'QuickhelpTinyMce';
 		$this->helpers[] = 'Text';
@@ -483,11 +499,9 @@ class TutorialsController extends AppController {
 			}
 		}
 
-		$this->redirect(Configure::read('user_config.proxy.prefix').Router::url(array($id), true));
-
 		// always use the user_url (slug) when viewing
 		if (!empty($tutorial['Tutorial']['user_url']) && !isset($this->params['slug'])) {
-			$this->redirect(array($id)); // the routing system will convert this to the slug URL
+			//$this->redirect(array($id)); // the routing system will convert this to the slug URL
 		}
 
 		if (!$this->Auth->user() && !$tutorial['Tutorial']['published']) {
