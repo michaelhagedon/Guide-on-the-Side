@@ -501,7 +501,7 @@ class TutorialsController extends AppController {
 
 		// always use the user_url (slug) when viewing
 		if (!empty($tutorial['Tutorial']['user_url']) && !isset($this->params['slug'])) {
-			//$this->redirect(array($id)); // the routing system will convert this to the slug URL
+			$this->redirect(array($id)); // the routing system will convert this to the slug URL
 		}
 
 		if (!$this->Auth->user() && !$tutorial['Tutorial']['published']) {
