@@ -1,4 +1,5 @@
 cake
+composer.phar
 docker-compose.local.yml
 lib
 config.yml
