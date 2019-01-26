@@ -68,7 +68,6 @@ class TutorialsController extends AppController {
     // TODO: sanitize
     if (isset($_GET['q'])) {
       $url = rawurldecode($_GET['q']);
-      $_GET['q'] = null;
       $request->get->set('q', null);
     }
     // Spaces in the proxified asset URLs don't work.
@@ -77,6 +76,7 @@ class TutorialsController extends AppController {
     $response = $proxy->forward($request, $url);
 
     $response->send();
+    exit();
   }
 
 	function beforeFilter() {
